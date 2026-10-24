@@ -1,0 +1,2435 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aynı Gökyüzü</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><path d=%22M16 28S4 21 4 12.5A6.5 6.5 0 0 1 16 9a6.5 6.5 0 0 1 12 3.5C28 21 16 28 16 28z%22 fill=%22%23e3b34f%22/></svg>">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Aynı Gökyüzü">
+<script>(function(){try{var t=localStorage.getItem("ls_theme");if(t==="light"||(!t&&window.matchMedia("(prefers-color-scheme: light)").matches)){document.documentElement.setAttribute("data-theme","light");}}catch(e){}})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --midnight-900:#0a0d1c;
+    --midnight-700:#141a35;
+    --midnight-500:#2c2a54;
+    --gold:#e3b34f;
+    --gold-soft:#f6dfa0;
+    --paper:#f6f1e7;
+    --ink:#efe9db;
+    --ink-dim:#c9c2d4;
+    --hairline:rgba(227,179,79,0.28);
+    --panel:rgba(246,241,231,0.045);
+    --sky-glow:#2c2a54;
+    --sky-glow-2:#141a35;
+  }
+  html[data-theme="light"]{
+    --midnight-900:#f6f1e7;
+    --midnight-700:#ece4d3;
+    --paper:#2a2440;
+    --ink:#3a3550;
+    --ink-dim:#6b6478;
+    --gold-soft:#8a6a1f;
+    --panel:rgba(10,13,28,0.045);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Manrope',sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(ellipse 120% 60% at 50% 0%, var(--sky-glow) 0%, transparent 60%),
+      linear-gradient(180deg, var(--midnight-900) 0%, var(--sky-glow-2) 55%, var(--midnight-900) 100%);
+    transition:background 1.5s ease;
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+  }
+  html[data-theme="light"] body,
+  html[data-theme="light"] .gate{
+    background:
+      radial-gradient(ellipse 120% 60% at 50% 0%, #dfe6f2 0%, transparent 60%),
+      linear-gradient(180deg, #f6f1e7 0%, #eee5d3 55%, #f6f1e7 100%);
+  }
+  h1,h2,.display{font-family:'Fraunces',serif;}
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important;}
+  }
+
+  canvas#sky{position:fixed;inset:0;z-index:0;display:block;}
+
+  /* giriş kapısı */
+  .gate{
+    position:fixed;inset:0;z-index:200;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+    background:
+      radial-gradient(ellipse 120% 60% at 50% 0%, var(--sky-glow) 0%, transparent 60%),
+      linear-gradient(180deg, var(--midnight-900) 0%, var(--sky-glow-2) 55%, var(--midnight-900) 100%);
+  }
+  .gate.hide{display:none;}
+  .gate-card{
+    max-width:360px;width:100%;
+    text-align:center;
+    padding:44px 32px;
+    border:1px solid var(--hairline);
+    border-radius:20px;
+    background:var(--panel);
+  }
+  .gate-eyebrow{
+    font-size:11px;letter-spacing:4px;text-transform:uppercase;
+    color:var(--gold);opacity:0.9;margin-bottom:14px;font-weight:600;
+  }
+  .gate-card h2{font-size:1.7rem;font-weight:500;color:var(--paper);}
+  .gate-hint{
+    margin-top:10px;font-family:'Fraunces',serif;font-style:italic;
+    color:var(--gold-soft);font-size:0.95rem;
+  }
+  #gateForm{margin-top:28px;display:flex;flex-direction:column;gap:14px;}
+  #gateForm input{
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--hairline);
+    color:var(--ink);
+    font-family:'Manrope',sans-serif;
+    font-size:15px;
+    padding:10px 4px;
+    text-align:center;
+    outline:none;
+    transition:border-color .2s ease;
+  }
+  #gateForm input::placeholder{color:var(--ink-dim);}
+  #gateForm input:focus{border-color:var(--gold);}
+  #gateForm button{
+    margin-top:8px;
+    background:var(--gold);
+    color:#0a0d1c;
+    border:none;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:12px 20px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  #gateForm button:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(227,179,79,0.3);}
+  .gate-error{
+    margin-top:16px;min-height:1.2em;
+    font-size:13px;color:var(--ink-dim);
+  }
+  .gate-card.shake{animation:gateShake .4s ease;}
+  @keyframes gateShake{25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
+
+  header{
+    position:relative;z-index:1;
+    text-align:center;
+    padding:110px 20px 70px;
+  }
+  header .eyebrow{
+    letter-spacing:5px;
+    font-size:11px;
+    text-transform:uppercase;
+    color:var(--gold);
+    opacity:0.9;
+    margin-bottom:22px;
+    font-weight:600;
+  }
+  header h1{
+    font-size:clamp(2.6rem,9vw,5.4rem);
+    font-weight:500;
+    line-height:1.05;
+    letter-spacing:-0.01em;
+    text-wrap:balance;
+  }
+  header h1 .amp{
+    display:inline-block;
+    font-style:italic;
+    color:var(--gold);
+    font-weight:500;
+    padding:0 0.12em;
+  }
+  header p.sub{
+    margin-top:22px;
+    font-size:clamp(1rem,2.3vw,1.2rem);
+    font-style:italic;
+    font-family:'Fraunces',serif;
+    color:var(--gold-soft);
+    max-width:540px;
+    margin-left:auto;margin-right:auto;
+    line-height:1.5;
+    text-wrap:balance;
+  }
+
+  main{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 20px 110px;}
+
+  section{margin-top:86px;}
+  .section-head{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:32px;
+    max-width:720px;
+    margin-left:auto;margin-right:auto;
+  }
+  .section-head .line{flex:1;height:1px;background:var(--hairline);}
+  .section-head h2{
+    font-size:clamp(1.4rem,3.4vw,1.9rem);
+    font-weight:500;
+    font-style:italic;
+    color:var(--paper);
+    white-space:nowrap;
+  }
+
+  /* countdown */
+  .countdown-wrap{
+    max-width:720px;margin:0 auto;
+    text-align:center;
+  }
+  .countdown-wrap .target-date{
+    font-size:13px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    margin-bottom:28px;
+  }
+  .timer{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:0;
+    flex-wrap:wrap;
+  }
+  .timer .box{
+    padding:0 22px;
+    text-align:center;
+  }
+  .timer .sep{
+    color:var(--gold);
+    opacity:0.5;
+    font-size:1.4rem;
+    transform:translateY(-6px);
+  }
+  .timer .box .num{
+    font-size:clamp(2rem,6vw,3.2rem);
+    font-weight:500;
+    font-family:'Fraunces',serif;
+    font-variant-numeric:tabular-nums;
+    color:var(--gold-soft);
+    line-height:1;
+    border-bottom:1px solid var(--hairline);
+    padding-bottom:14px;
+  }
+  .timer .box .lbl{
+    margin-top:10px;
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+  }
+  .countdown-wrap .reunion-msg{
+    margin-top:34px;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:1.15rem;
+    color:var(--paper);
+  }
+  .countdown-wrap.done .timer{display:none;}
+
+  /* quote card */
+  .quote-card{
+    max-width:640px;margin:0 auto;
+    text-align:center;
+    padding:8px 10px 0;
+  }
+  .quote-card .mark{
+    font-family:'Fraunces',serif;
+    font-size:3rem;color:var(--gold);opacity:0.55;line-height:1;
+    font-style:italic;
+  }
+  .quote-card p{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:clamp(1.3rem,3.4vw,1.75rem);
+    line-height:1.5;
+    margin:10px 0 18px;
+    color:var(--paper);
+    text-wrap:balance;
+  }
+  .quote-card .date-lbl{
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+  }
+
+  /* song ticket */
+  .ticket{
+    max-width:520px;margin:0 auto;
+    display:flex;
+    background:var(--panel);
+    border:1px solid var(--hairline);
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .ticket .stub{
+    width:88px;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    border-right:1px dashed var(--hairline);
+    position:relative;
+  }
+  .ticket .stub svg{width:34px;height:34px;color:var(--gold);}
+  .ticket .body{
+    flex:1;
+    padding:26px 24px;
+    text-align:left;
+  }
+  .ticket .kicker{
+    font-size:10px;letter-spacing:2px;text-transform:uppercase;
+    color:var(--ink-dim);margin-bottom:8px;
+  }
+  .ticket .song-name{
+    font-family:'Fraunces',serif;
+    font-size:1.4rem;
+    color:var(--paper);
+    margin-bottom:16px;
+  }
+  .ticket a.btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:transparent;
+    color:var(--gold);
+    text-decoration:none;
+    font-weight:600;
+    font-size:13px;
+    letter-spacing:0.5px;
+    border:1px solid var(--gold);
+    padding:9px 20px;
+    border-radius:999px;
+    transition:background .2s ease, color .2s ease;
+  }
+  .ticket a.btn:hover{background:var(--gold);color:#0a0d1c;}
+
+  .playlist-embed{
+    max-width:520px;margin:16px auto 0;
+    border-radius:14px;overflow:hidden;
+    border:1px solid var(--hairline);
+  }
+  .playlist-embed iframe{display:block;}
+
+  /* gallery - scattered polaroids */
+  .gallery{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:26px 18px;
+    padding:20px 10px 0;
+  }
+  .photo{
+    --paper:#f6f1e7;
+    --midnight-700:#141a35;
+    --ink-dim:#c9c2d4;
+    position:relative;
+    width:168px;
+    background:var(--paper);
+    padding:10px 10px 30px;
+    border-radius:3px;
+    box-shadow:0 10px 24px rgba(0,0,0,0.35);
+    cursor:pointer;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .photo:nth-child(4n+1){transform:rotate(-4deg);}
+  .photo:nth-child(4n+2){transform:rotate(3deg);}
+  .photo:nth-child(4n+3){transform:rotate(-2deg);}
+  .photo:nth-child(4n+4){transform:rotate(4deg);}
+  .photo:hover{transform:rotate(0deg) scale(1.05);box-shadow:0 16px 32px rgba(0,0,0,0.45);z-index:2;}
+  .photo .frame{
+    aspect-ratio:1/1;
+    background:var(--midnight-700);
+    overflow:hidden;
+    position:relative;
+  }
+  .photo img{width:100%;height:100%;object-fit:cover;display:block;}
+  .photo .placeholder{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:6px;
+    color:var(--ink-dim);
+    font-size:10.5px;
+    text-align:center;
+    padding:8px;
+  }
+  .photo .placeholder svg{width:20px;height:20px;opacity:0.6;}
+  .photo .cap{
+    position:absolute;bottom:6px;left:0;right:0;
+    text-align:center;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:12px;
+    color:var(--midnight-700);
+  }
+
+  .lightbox{
+    position:fixed;inset:0;background:rgba(6,7,15,0.92);
+    display:none;align-items:center;justify-content:center;
+    z-index:50;padding:24px;
+  }
+  .lightbox.open{display:flex;}
+  .lightbox img{max-width:100%;max-height:88vh;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,0.6);}
+
+  /* secret stars in hero */
+  .secret-layer{position:absolute;inset:0;pointer-events:none;}
+  .secret-star{
+    position:absolute;
+    width:26px;height:26px;
+    margin:-13px 0 0 -13px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    pointer-events:auto;
+    background:transparent;
+    border:none;
+  }
+  .secret-star::before{
+    content:'';
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--gold-soft);
+    box-shadow:0 0 10px 3px rgba(246,223,160,0.75);
+    animation:twinkle 2.6s ease-in-out infinite;
+  }
+  .secret-star:nth-child(2)::before{animation-delay:.5s;}
+  .secret-star:nth-child(3)::before{animation-delay:1s;}
+  .secret-star:nth-child(4)::before{animation-delay:1.5s;}
+  .secret-star:nth-child(5)::before{animation-delay:2s;}
+  .secret-star.found::before{background:var(--gold);box-shadow:0 0 14px 5px rgba(227,179,79,0.9);animation:none;}
+  .secret-star.special::before{width:8px;height:8px;box-shadow:0 0 16px 5px rgba(246,223,160,0.9);animation-duration:1.8s;}
+  @keyframes twinkle{0%,100%{opacity:0.35;transform:scale(0.85);}50%{opacity:1;transform:scale(1.15);}}
+
+  .hero-hint{
+    margin-top:16px;
+    font-size:11.5px;
+    letter-spacing:1px;
+    color:var(--ink-dim);
+  }
+  .hero-hint b{color:var(--gold);font-weight:600;}
+
+  .secret-panel{
+    max-width:420px;margin:18px auto 0;
+    padding:16px 20px;
+    border:1px solid var(--hairline);
+    border-radius:12px;
+    background:var(--panel);
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:1.5rem;
+    letter-spacing:0.3px;
+    color:var(--gold-soft);
+    opacity:0;
+    max-height:0;
+    overflow:hidden;
+    transition:opacity .4s ease, max-height .4s ease, padding .4s ease, margin .4s ease, box-shadow .4s ease;
+  }
+  .secret-panel.show{opacity:1;max-height:200px;}
+  .secret-panel.celebrate{color:var(--gold);box-shadow:0 0 0 1px var(--gold), 0 0 26px 4px rgba(227,179,79,0.35);}
+
+  .secret-reward{
+    max-width:460px;margin:22px auto 0;
+    padding:0 26px;
+    border:1px solid var(--hairline);
+    border-radius:14px;
+    background:var(--panel);
+    text-align:center;
+    opacity:0;max-height:0;overflow:hidden;
+    transition:opacity .7s ease, max-height .7s ease, padding .7s ease, margin .7s ease, box-shadow .7s ease;
+  }
+  .secret-reward.show{
+    opacity:1;max-height:400px;padding:24px 26px;
+    box-shadow:0 0 0 1px var(--gold), 0 0 30px 4px rgba(227,179,79,0.3);
+  }
+  .secret-reward .kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;font-weight:600;}
+  .secret-reward .title{font-family:'Fraunces',serif;font-size:1.3rem;color:var(--paper);margin-bottom:12px;}
+  .secret-reward .text{font-family:'Fraunces',serif;font-style:italic;color:var(--gold-soft);font-size:1.02rem;line-height:1.6;}
+
+  /* shooting star */
+  .shooting-star{
+    position:fixed;top:0;left:0;z-index:6;
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+  }
+  .shooting-star .dot{
+    width:3px;height:3px;border-radius:50%;
+    background:#fff;
+    box-shadow:
+      0 0 8px 3px rgba(246,223,160,0.9),
+      -16px 6px 10px -2px rgba(246,223,160,0.35),
+      -30px 12px 14px -4px rgba(246,223,160,0.18);
+  }
+
+  /* giriş kutlaması */
+  .confetti-layer{position:fixed;inset:0;z-index:210;pointer-events:none;overflow:hidden;}
+  .confetti-piece{
+    position:absolute;top:-40px;left:0;
+    opacity:0;
+    text-shadow:0 0 8px rgba(227,179,79,0.5);
+    animation-name:confettiFall;
+    animation-timing-function:ease-in;
+    animation-fill-mode:forwards;
+  }
+  @keyframes confettiFall{
+    0%{transform:translate(0,0) rotate(0deg);opacity:0;}
+    8%{opacity:1;}
+    100%{transform:translate(var(--drift), 112vh) rotate(var(--rotate));opacity:0;}
+  }
+
+  .wish-toast{
+    position:fixed;top:26px;left:50%;
+    transform:translate(-50%,-14px);
+    background:rgba(10,13,28,0.92);
+    border:1px solid var(--hairline);
+    border-radius:999px;
+    padding:12px 26px;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    color:var(--gold-soft);
+    font-size:0.95rem;
+    z-index:60;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .5s ease, transform .5s ease;
+    max-width:88vw;
+    text-align:center;
+  }
+  .wish-toast.show{opacity:1;transform:translate(-50%,0);}
+
+  /* timeline */
+  .timeline{
+    max-width:640px;margin:0 auto;
+    border-left:1px solid var(--hairline);
+    padding-left:28px;
+    display:flex;flex-direction:column;gap:34px;
+  }
+  .timeline .item{position:relative;}
+  .timeline .item::before{
+    content:'';
+    position:absolute;left:-33px;top:4px;
+    width:9px;height:9px;border-radius:50%;
+    background:var(--gold);
+    box-shadow:0 0 0 4px var(--midnight-900), 0 0 10px 2px rgba(227,179,79,0.5);
+  }
+  .timeline .date{
+    font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);
+    margin-bottom:6px;
+  }
+  .timeline .title{
+    font-family:'Fraunces',serif;font-size:1.3rem;color:var(--paper);margin-bottom:6px;
+  }
+  .timeline .text{color:var(--ink-dim);font-size:0.95rem;line-height:1.6;max-width:52ch;}
+
+  /* reason button */
+  .reason-wrap{max-width:520px;margin:0 auto;text-align:center;}
+  .reason-btn{
+    background:var(--gold);
+    color:#0a0d1c;
+    border:none;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    letter-spacing:0.3px;
+    padding:14px 30px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .reason-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(227,179,79,0.35);}
+  .reason-reveal{
+    margin-top:26px;
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:clamp(1.15rem,3vw,1.5rem);
+    color:var(--paper);
+    min-height:1.6em;
+    opacity:0;
+    transform:translateY(6px) scale(0.98);
+    transition:opacity .35s ease, transform .35s ease;
+    text-wrap:balance;
+  }
+  .reason-reveal.show{opacity:1;transform:translateY(0) scale(1);}
+  .spark{
+    position:fixed;z-index:60;pointer-events:none;
+    color:var(--gold);font-size:14px;
+  }
+
+  /* sonsuza kadar sorusu */
+  .forever-wrap{max-width:560px;margin:0 auto;text-align:center;}
+  .forever-q{
+    font-family:'Fraunces',serif;font-style:italic;
+    font-size:clamp(1.2rem,3.2vw,1.6rem);color:var(--paper);
+    margin-bottom:34px;text-wrap:balance;
+  }
+  .forever-btns{
+    position:relative;
+    min-height:120px;
+    display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;
+  }
+  .forever-yes, .forever-no{
+    font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;
+    padding:14px 30px;border-radius:999px;cursor:pointer;border:none;
+    transition:transform .2s ease, box-shadow .2s ease, font-size .25s ease, padding .25s ease;
+  }
+  .forever-yes{background:var(--gold);color:#0a0d1c;}
+  .forever-yes:hover{box-shadow:0 10px 24px rgba(227,179,79,0.35);}
+  .forever-no{background:transparent;border:1px solid var(--hairline);color:var(--ink-dim);}
+  .forever-no.dodging{position:absolute;transition:left .28s ease, top .28s ease, font-size .25s ease, padding .25s ease;}
+  .forever-reveal{
+    margin-top:30px;font-family:'Fraunces',serif;font-style:italic;
+    font-size:clamp(1.2rem,3.4vw,1.7rem);color:var(--gold-soft);
+    min-height:1.6em;opacity:0;transform:translateY(8px) scale(0.97);
+    transition:opacity .5s ease, transform .5s ease;text-wrap:balance;
+  }
+  .forever-reveal.show{opacity:1;transform:translateY(0) scale(1);}
+
+  /* kilometre taşı kutlaması */
+  .milestone-overlay{
+    position:fixed;inset:0;z-index:220;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(6,7,15,0.82);
+    padding:24px;
+    animation:milestoneFade .4s ease;
+  }
+  @keyframes milestoneFade{from{opacity:0;}to{opacity:1;}}
+  .milestone-card{
+    max-width:340px;width:100%;text-align:center;
+    padding:44px 32px;border:1px solid var(--hairline);border-radius:20px;
+    background:linear-gradient(180deg, var(--midnight-700), var(--midnight-900));
+    box-shadow:0 0 0 1px var(--gold), 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .milestone-kicker{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;font-weight:600;}
+  .milestone-num{font-family:'Fraunces',serif;font-size:4rem;font-weight:500;color:var(--gold-soft);line-height:1;}
+  .milestone-label{margin-top:8px;font-family:'Fraunces',serif;font-style:italic;color:var(--paper);font-size:1.1rem;}
+  .milestone-close{
+    margin-top:26px;background:var(--gold);color:#0a0d1c;border:none;
+    font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;
+    padding:11px 26px;border-radius:999px;cursor:pointer;
+  }
+
+  /* anı eşleştirme oyunu */
+  .memory-card{max-width:640px;margin:0 auto;text-align:center;}
+  .memory-status{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-dim);margin-bottom:20px;}
+  .memory-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    perspective:800px;
+  }
+  @media (max-width:480px){.memory-grid{grid-template-columns:repeat(3,1fr);}}
+  .memory-tile{aspect-ratio:1/1;position:relative;cursor:pointer;}
+  .memory-tile-inner{
+    position:absolute;inset:0;
+    transform-style:preserve-3d;
+    transition:transform .5s cubic-bezier(.4,.2,.2,1);
+  }
+  .memory-tile.flipped .memory-tile-inner,
+  .memory-tile.matched .memory-tile-inner{transform:rotateY(180deg);}
+  .memory-face{
+    position:absolute;inset:0;
+    backface-visibility:hidden;
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    overflow:hidden;
+  }
+  .memory-face.back{
+    background:var(--panel);
+    border:1px solid var(--hairline);
+    color:var(--gold);
+    font-size:1.3rem;
+  }
+  .memory-face.front{
+    transform:rotateY(180deg);
+    background:var(--midnight-700);
+    border:1px solid var(--hairline);
+  }
+  .memory-face.front img{width:100%;height:100%;object-fit:cover;display:block;}
+  .memory-face.front .ph-icon{width:22px;height:22px;color:var(--ink-dim);}
+  .memory-tile.matched .memory-face.front{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold), 0 0 16px 2px rgba(227,179,79,0.35);}
+  .memory-win{
+    margin-top:26px;
+    font-family:'Fraunces',serif;font-style:italic;
+    font-size:clamp(1.1rem,3vw,1.4rem);color:var(--paper);
+    min-height:1.6em;opacity:0;transform:translateY(6px);
+    transition:opacity .4s ease, transform .4s ease;
+    text-wrap:balance;
+  }
+  .memory-win.show{opacity:1;transform:translateY(0);}
+  .memory-restart{
+    margin-top:22px;
+    background:transparent;
+    border:1px solid var(--gold);
+    color:var(--gold);
+    font-size:13px;font-weight:600;
+    padding:9px 22px;border-radius:999px;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease;
+  }
+  .memory-restart:hover{background:var(--gold);color:#0a0d1c;}
+
+  /* ruh hali takvimi */
+  .mood-wrap{max-width:640px;margin:0 auto;text-align:center;}
+  .mood-hint{font-size:0.85rem;color:var(--ink-dim);font-family:'Fraunces',serif;font-style:italic;margin-bottom:22px;}
+  .mood-picker{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:30px;}
+  .mood-opt{
+    background:var(--panel);
+    border:1px solid var(--hairline);
+    border-radius:12px;
+    padding:10px 14px;
+    font-size:1.5rem;
+    line-height:1;
+    cursor:pointer;
+    transition:transform .15s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .mood-opt:hover{transform:translateY(-2px);border-color:var(--gold);}
+  .mood-opt.selected{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold), 0 0 16px 2px rgba(227,179,79,0.3);}
+  .mood-row{max-width:520px;margin:0 auto 14px;text-align:left;}
+  .mood-row-label{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+  .mood-heatmap{
+    display:grid;
+    grid-template-columns:repeat(15, 1fr);
+    gap:5px;
+    max-width:520px;
+    margin:0 auto;
+  }
+  @media (max-width:480px){.mood-heatmap{grid-template-columns:repeat(10, 1fr);}}
+  .mood-cell{
+    aspect-ratio:1/1;
+    border-radius:3px;
+    background:var(--panel);
+    border:1px solid var(--hairline);
+  }
+  .mood-cell.today{box-shadow:0 0 0 1px var(--gold);}
+  .mood-legend{
+    margin-top:18px;
+    display:flex;justify-content:center;gap:14px;flex-wrap:wrap;
+    font-size:11px;color:var(--ink-dim);
+  }
+  .mood-legend span{display:inline-flex;align-items:center;gap:5px;}
+  .mood-legend .dot{width:9px;height:9px;border-radius:2px;display:inline-block;}
+
+  /* bugünün sorusu */
+  .dailyq-wrap{max-width:560px;margin:0 auto;text-align:center;}
+  .dailyq-question{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:500;
+    font-size:clamp(1.2rem,3vw,1.5rem);color:var(--paper);
+    margin-bottom:24px;text-wrap:balance;
+  }
+  #dailyqForm{display:flex;flex-direction:column;gap:12px;align-items:center;}
+  #dailyqForm textarea{
+    width:100%;max-width:480px;
+    background:transparent;
+    border:1px solid var(--hairline);
+    border-radius:12px;
+    color:var(--ink);
+    font-family:'Manrope',sans-serif;
+    font-size:14px;
+    padding:12px 14px;
+    outline:none;
+    resize:vertical;
+    transition:border-color .2s ease;
+  }
+  #dailyqForm textarea::placeholder{color:var(--ink-dim);}
+  #dailyqForm textarea:focus{border-color:var(--gold);}
+  #dailyqForm button{
+    background:var(--gold);
+    color:#0a0d1c;
+    border:none;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:12px 26px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  #dailyqForm button:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(227,179,79,0.3);}
+  .dailyq-answers{margin-top:24px;display:flex;flex-direction:column;gap:14px;text-align:left;max-width:480px;margin-left:auto;margin-right:auto;}
+  .dailyq-answer{
+    padding:14px 16px;
+    border:1px solid var(--hairline);
+    border-radius:12px;
+    background:var(--panel);
+  }
+  .dailyq-answer .who{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;font-weight:600;}
+  .dailyq-answer .text{font-family:'Fraunces',serif;font-style:italic;color:var(--paper);font-size:1rem;line-height:1.5;}
+  .dailyq-waiting{font-size:13px;color:var(--ink-dim);font-style:italic;}
+
+  /* "sen kimsin" ekranı */
+  .who-overlay{
+    position:fixed;inset:0;z-index:215;
+    display:none;align-items:center;justify-content:center;
+    background:rgba(6,7,15,0.88);
+    padding:24px;
+  }
+  .who-overlay.show{display:flex;}
+  .who-card{
+    max-width:340px;width:100%;text-align:center;
+    padding:40px 30px;border:1px solid var(--hairline);border-radius:20px;
+    background:linear-gradient(180deg, var(--midnight-700), var(--midnight-900));
+    box-shadow:0 0 0 1px var(--gold), 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .who-eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;font-weight:600;}
+  .who-card h2{font-size:1.5rem;font-weight:500;color:var(--paper);}
+  .who-hint{margin-top:10px;font-size:0.88rem;color:var(--ink-dim);line-height:1.5;}
+  .who-btns{margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .who-btn{
+    background:var(--gold);color:#0a0d1c;border:none;
+    font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;
+    padding:12px 26px;border-radius:999px;cursor:pointer;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .who-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(227,179,79,0.3);}
+  .who-change{margin-top:10px;}
+  .who-change button{background:none;border:none;color:var(--ink-dim);font-size:11px;text-decoration:underline;cursor:pointer;padding:0;}
+  .who-change button:hover{color:var(--gold);}
+
+  /* sonsuza kadar sertifikası */
+  .cert-open-btn{
+    margin-top:18px;
+    display:none;
+    background:transparent;border:1px solid var(--gold);color:var(--gold);
+    font-family:'Manrope',sans-serif;font-weight:600;font-size:13px;
+    padding:10px 22px;border-radius:999px;cursor:pointer;
+    transition:background .2s ease, color .2s ease;
+  }
+  .cert-open-btn.show{display:inline-block;}
+  .cert-open-btn:hover{background:var(--gold);color:#0a0d1c;}
+  .certificate-overlay{
+    position:fixed;inset:0;z-index:225;
+    display:none;
+    flex-direction:column;
+    align-items:center;justify-content:center;
+    gap:20px;
+    background:rgba(6,7,15,0.88);
+    padding:24px;
+    overflow-y:auto;
+  }
+  .certificate-overlay.show{display:flex;}
+  .certificate{--paper:#f6f1e7;max-width:480px;width:100%;background:var(--paper);border-radius:6px;padding:14px;box-shadow:0 30px 80px rgba(0,0,0,0.6);}
+  .cert-border{border:2px solid var(--gold);outline:1px solid var(--gold);outline-offset:6px;padding:44px 30px;text-align:center;}
+  .cert-kicker{font-family:'Fraunces',serif;font-style:italic;color:#8a6a1f;letter-spacing:2px;font-size:1rem;margin-bottom:26px;}
+  .cert-body{font-family:'Fraunces',serif;font-size:1.15rem;line-height:1.7;color:#2a2440;}
+  .cert-body b{color:#8a6a1f;}
+  .cert-date{margin-top:26px;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#6b6456;}
+  .cert-sign{margin-top:18px;font-family:'Fraunces',serif;font-style:italic;font-size:1.4rem;color:#2a2440;}
+  .cert-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
+  .cert-print, .cert-close{
+    font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;
+    padding:11px 22px;border-radius:999px;cursor:pointer;border:none;
+  }
+  .cert-print{background:var(--gold);color:#0a0d1c;}
+  .cert-close{background:transparent;border:1px solid var(--hairline);color:var(--ink-dim);}
+  @media print{
+    body *{ visibility:hidden; }
+    .certificate, .certificate *{ visibility:visible; }
+    .certificate-overlay{ position:absolute; inset:auto; background:none; padding:0; display:block !important; overflow:visible; }
+    .certificate{ position:absolute; left:0; top:0; box-shadow:none; }
+    .cert-actions{ display:none !important; }
+  }
+
+  /* seninle yapmak istediğim şeyler */
+  .wishlist-wrap{max-width:560px;margin:0 auto;text-align:center;}
+  .wishlist-hint{font-size:0.92rem;color:var(--ink-dim);margin-bottom:24px;font-family:'Fraunces',serif;font-style:italic;}
+  #wishlistForm{display:flex;gap:10px;margin-bottom:26px;}
+  #wishlistForm input{
+    flex:1;
+    background:transparent;
+    border:1px solid var(--hairline);
+    border-radius:10px;
+    color:var(--ink);
+    font-family:'Manrope',sans-serif;
+    font-size:14px;
+    padding:12px 14px;
+    outline:none;
+    transition:border-color .2s ease;
+  }
+  #wishlistForm input::placeholder{color:var(--ink-dim);}
+  #wishlistForm input:focus{border-color:var(--gold);}
+  #wishlistForm button{
+    background:var(--gold);
+    color:#0a0d1c;
+    border:none;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:12px 22px;
+    border-radius:999px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  #wishlistForm button:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(227,179,79,0.3);}
+  .wishlist-list{list-style:none;display:flex;flex-direction:column;gap:10px;text-align:left;}
+  .wishlist-item{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 14px;
+    border:1px solid var(--hairline);
+    border-radius:12px;
+    background:var(--panel);
+  }
+  .wishlist-check{
+    flex-shrink:0;
+    width:22px;height:22px;border-radius:50%;
+    border:1px solid var(--gold);
+    background:transparent;
+    color:var(--gold);
+    font-size:13px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    transition:background .2s ease, color .2s ease;
+  }
+  .wishlist-item.done .wishlist-check{background:var(--gold);color:#0a0d1c;}
+  .wishlist-text{flex:1;font-size:14.5px;color:var(--ink);word-break:break-word;}
+  .wishlist-item.done .wishlist-text{color:var(--ink-dim);text-decoration:line-through;}
+  .wishlist-del{
+    flex-shrink:0;
+    background:transparent;border:none;
+    color:var(--ink-dim);
+    font-size:18px;line-height:1;
+    cursor:pointer;
+    padding:4px;
+    transition:color .2s ease;
+  }
+  .wishlist-del:hover{color:var(--gold);}
+  .wishlist-empty{font-size:13px;color:var(--ink-dim);font-style:italic;padding:10px 0;display:none;}
+
+  /* not defteri */
+  .guestbook-wrap{max-width:480px;margin:0 auto;text-align:center;}
+  .guestbook-hint{font-size:0.92rem;color:var(--ink-dim);margin-bottom:24px;font-family:'Fraunces',serif;font-style:italic;}
+  #guestbookForm{display:flex;flex-direction:column;gap:14px;text-align:left;}
+  .hp-field{position:absolute;left:-9999px;}
+  #guestbookForm input[type="text"],
+  #guestbookForm textarea{
+    background:transparent;
+    border:1px solid var(--hairline);
+    border-radius:10px;
+    color:var(--ink);
+    font-family:'Manrope',sans-serif;
+    font-size:14px;
+    padding:12px 14px;
+    outline:none;
+    resize:vertical;
+    transition:border-color .2s ease;
+  }
+  #guestbookForm input[type="text"]::placeholder,
+  #guestbookForm textarea::placeholder{color:var(--ink-dim);}
+  #guestbookForm input[type="text"]:focus,
+  #guestbookForm textarea:focus{border-color:var(--gold);}
+  .guestbook-btn{
+    align-self:center;
+    margin-top:4px;
+    background:var(--gold);
+    color:#0a0d1c;
+    border:none;
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:12px 28px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .guestbook-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(227,179,79,0.3);}
+  .guestbook-success{
+    margin-top:20px;
+    font-family:'Fraunces',serif;font-style:italic;color:var(--gold-soft);
+    font-size:1.05rem;
+    opacity:0;max-height:0;overflow:hidden;
+    transition:opacity .4s ease, max-height .4s ease;
+  }
+  .guestbook-success.show{opacity:1;max-height:100px;}
+
+  /* share / qr */
+  .share-card{
+    max-width:420px;margin:0 auto;text-align:center;
+    display:flex;flex-direction:column;align-items:center;gap:18px;
+  }
+  .share-card .qr-box{
+    --paper:#f6f1e7;
+    background:var(--paper);
+    padding:14px;border-radius:12px;
+    box-shadow:0 10px 26px rgba(0,0,0,0.35);
+  }
+  .share-card .qr-box img{display:block;width:180px;height:180px;}
+  .share-card .qr-fallback{font-size:13px;color:#0a0d1c;max-width:180px;}
+  .share-card .url-text{font-size:13px;color:var(--ink-dim);word-break:break-all;}
+  .share-card .copy-btn{
+    background:transparent;border:1px solid var(--gold);color:var(--gold);
+    font-size:13px;font-weight:600;padding:9px 22px;border-radius:999px;cursor:pointer;
+    transition:background .2s ease, color .2s ease;
+  }
+  .share-card .copy-btn:hover{background:var(--gold);color:#0a0d1c;}
+
+  /* music toggle */
+  .music-btn{
+    position:fixed;right:20px;bottom:20px;z-index:40;
+    width:48px;height:48px;border-radius:50%;
+    background:rgba(10,13,28,0.75);
+    border:1px solid var(--hairline);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    backdrop-filter:blur(6px);
+    transition:box-shadow .3s ease;
+  }
+  .music-btn svg{width:20px;height:20px;color:var(--gold-soft);}
+  .music-btn.playing{box-shadow:0 0 0 6px rgba(227,179,79,0.14);}
+
+  /* theme toggle */
+  .theme-toggle{
+    position:fixed;top:20px;right:20px;z-index:210;
+    width:44px;height:44px;border-radius:50%;
+    background:rgba(10,13,28,0.75);
+    border:1px solid var(--hairline);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    backdrop-filter:blur(6px);
+    transition:background .3s ease, box-shadow .3s ease;
+  }
+  .theme-toggle svg{width:18px;height:18px;color:var(--gold-soft);}
+  .theme-toggle .icon-sun{display:none;}
+  html[data-theme="light"] .theme-toggle{background:rgba(246,241,231,0.85);}
+  html[data-theme="light"] .theme-toggle .icon-moon{display:none;}
+  html[data-theme="light"] .theme-toggle .icon-sun{display:block;}
+
+  footer{
+    position:relative;z-index:1;
+    text-align:center;
+    padding:50px 20px 70px;
+    font-size:12px;
+    letter-spacing:1px;
+    color:var(--ink-dim);
+  }
+  footer .star{color:var(--gold);}
+  footer .footer-names{text-transform:uppercase;}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-eyebrow">Bu sayfa özel</div>
+    <h2>Girmeden önce...</h2>
+    <p class="gate-hint">Sadece <span class="name-2"></span> girebilir.</p>
+    <form id="gateForm" autocomplete="off">
+      <input type="text" id="gateUser" placeholder="Kullanıcı adı" autocomplete="off">
+      <input type="text" id="gatePass" placeholder="Şifre" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" style="-webkit-text-security:disc;text-security:disc;">
+      <button type="submit">Giriş Yap</button>
+    </form>
+    <div class="gate-error" id="gateError"></div>
+  </div>
+</div>
+
+<div class="who-overlay" id="whoOverlay">
+  <div class="who-card">
+    <div class="who-eyebrow">Bir kerelik soru</div>
+    <h2>Sen kimsin?</h2>
+    <p class="who-hint">Ruh hali ve günün sorusu gibi paylaşımlı bölümlerde ikinizi ayırt edebilmemiz için soruyoruz.</p>
+    <div class="who-btns">
+      <button class="who-btn name-1" id="whoP1" type="button"></button>
+      <button class="who-btn name-2" id="whoP2" type="button"></button>
+    </div>
+  </div>
+</div>
+
+<canvas id="sky"></canvas>
+
+<button class="theme-toggle" id="themeToggle" aria-label="Açık/koyu tema değiştir">
+  <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+</button>
+
+<header>
+  <div class="secret-layer" id="secretLayer"></div>
+  <div class="eyebrow">Tekrar buluşana kadar</div>
+  <h1><span class="name-1"></span> <span class="amp">&amp;</span> <span class="name-2"></span></h1>
+  <p class="sub">Aynı gökyüzünün altında, ayrı şehirlerde. Bu sayfa sana her gün yeni bir söz ve yeni bir şarkı getirecek — yeniden yan yana durana kadar.</p>
+  <p class="hero-hint">Gökyüzünde <b><span id="secretFound">0</span>/<span id="secretTotal">5</span></b> gizli yıldız saklı, bulabilir misin?</p>
+  <div class="secret-panel" id="secretPanel"></div>
+  <div class="secret-reward" id="secretReward"></div>
+</header>
+
+<main>
+
+  <section id="countdown">
+    <div class="section-head"><div class="line"></div><h2>Geri Sayım</h2><div class="line"></div></div>
+    <div class="countdown-wrap" id="countdownWrap">
+      <div class="target-date" id="targetDateLabel"></div>
+      <div class="timer">
+        <div class="box"><div class="num" id="cd-days">00</div><div class="lbl">Gün</div></div>
+        <div class="sep">&middot;</div>
+        <div class="box"><div class="num" id="cd-hours">00</div><div class="lbl">Saat</div></div>
+        <div class="sep">&middot;</div>
+        <div class="box"><div class="num" id="cd-mins">00</div><div class="lbl">Dakika</div></div>
+        <div class="sep">&middot;</div>
+        <div class="box"><div class="num" id="cd-secs">00</div><div class="lbl">Saniye</div></div>
+      </div>
+      <div class="reunion-msg" id="reunionMsg">Her saniye seni biraz daha özlüyorum.</div>
+    </div>
+  </section>
+
+  <section id="timeline">
+    <div class="section-head"><div class="line"></div><h2>Hikayemiz</h2><div class="line"></div></div>
+    <div class="timeline" id="timelineList"></div>
+  </section>
+
+  <section id="quote">
+    <div class="section-head"><div class="line"></div><h2>Bugünün Sözü</h2><div class="line"></div></div>
+    <div class="quote-card">
+      <div class="mark">&ldquo;</div>
+      <p id="dailyQuote">Yükleniyor...</p>
+      <div class="date-lbl" id="quoteDate"></div>
+    </div>
+  </section>
+
+  <section id="song">
+    <div class="section-head"><div class="line"></div><h2>Bugünün Şarkısı</h2><div class="line"></div></div>
+    <div class="ticket">
+      <div class="stub">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/></svg>
+      </div>
+      <div class="body">
+        <div class="kicker">Günün Parçası</div>
+        <div class="song-name" id="songName">Yükleniyor...</div>
+        <a class="btn" id="songLink" href="#" target="_blank" rel="noopener">Spotify'da Dinle</a>
+      </div>
+    </div>
+    <div class="playlist-embed" id="playlistEmbed">
+      <iframe id="playlistFrame" width="100%" height="152" frameborder="0" allowfullscreen loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+    </div>
+  </section>
+
+  <section id="dailyq">
+    <div class="section-head"><div class="line"></div><h2>Bugünün Sorusu</h2><div class="line"></div></div>
+    <div class="dailyq-wrap">
+      <p class="dailyq-question" id="dailyqQuestion">Yükleniyor...</p>
+      <form id="dailyqForm">
+        <textarea id="dailyqInput" placeholder="Cevabını yaz..." rows="3" required></textarea>
+        <button type="submit">Cevabımı Gönder</button>
+      </form>
+      <div class="dailyq-answers" id="dailyqAnswers"></div>
+    </div>
+  </section>
+
+  <section id="mood">
+    <div class="section-head"><div class="line"></div><h2>Bugün Nasılsın?</h2><div class="line"></div></div>
+    <div class="mood-wrap">
+      <p class="mood-hint">Seçtiğin taş diğerine de görünür.</p>
+      <div class="mood-picker" id="moodPicker"></div>
+      <div class="mood-row"><span class="mood-row-label name-1"></span><div class="mood-heatmap" id="moodHeatmap1"></div></div>
+      <div class="mood-row"><span class="mood-row-label name-2"></span><div class="mood-heatmap" id="moodHeatmap2"></div></div>
+      <div class="mood-legend" id="moodLegend"></div>
+    </div>
+  </section>
+
+  <section id="reason">
+    <div class="section-head"><div class="line"></div><h2>Sürpriz</h2><div class="line"></div></div>
+    <div class="reason-wrap">
+      <button class="reason-btn" id="reasonBtn">Seni neden sevdiğimi söyleyeyim</button>
+      <div class="reason-reveal" id="reasonReveal"></div>
+    </div>
+  </section>
+
+  <section id="gallery">
+    <div class="section-head"><div class="line"></div><h2>Anılarımız</h2><div class="line"></div></div>
+    <div class="gallery" id="galleryGrid"></div>
+  </section>
+
+  <section id="memory">
+    <div class="section-head"><div class="line"></div><h2>Anı Eşleştirme Oyunu</h2><div class="line"></div></div>
+    <div class="memory-card" id="memoryCard">
+      <div class="memory-status" id="memoryStatus"></div>
+      <div class="memory-grid" id="memoryGrid"></div>
+      <div class="memory-win" id="memoryWin"></div>
+      <button class="memory-restart" id="memoryRestart">Yeniden Karıştır</button>
+    </div>
+  </section>
+
+  <section id="forever">
+    <div class="section-head"><div class="line"></div><h2>Son Bir Soru</h2><div class="line"></div></div>
+    <div class="forever-wrap">
+      <p class="forever-q">Sonsuza kadar benimle olur musun?</p>
+      <div class="forever-btns" id="foreverBtns">
+        <button class="forever-yes" id="foreverYes">Evet</button>
+        <button class="forever-no" id="foreverNo">Hayır</button>
+      </div>
+      <div class="forever-reveal" id="foreverReveal"></div>
+      <button class="cert-open-btn" id="certOpenBtn">Sertifikanı Gör</button>
+    </div>
+  </section>
+
+  <div class="certificate-overlay" id="certOverlay">
+    <div class="certificate" id="certificate">
+      <div class="cert-border">
+        <div class="cert-kicker">&#10022; Sonsuza Kadar Sertifikası &#10022;</div>
+        <div class="cert-body">
+          Bu sertifika ile <b class="name-2"></b> ve <b class="name-1"></b>, sonsuza kadar,
+          her koşulda, her mesafede birlikte olmayı kabul ettiklerini onaylar.
+        </div>
+        <div class="cert-date" id="certDate"></div>
+        <div class="cert-sign"><span class="name-1"></span> &#9825;</div>
+      </div>
+    </div>
+    <div class="cert-actions">
+      <button class="cert-print" id="certPrintBtn">Yazdır / PDF Kaydet</button>
+      <button class="cert-close" id="certCloseBtn">Kapat</button>
+    </div>
+  </div>
+
+  <section id="wishlist">
+    <div class="section-head"><div class="line"></div><h2>Seninle Yapmak İstediğim Şeyler</h2><div class="line"></div></div>
+    <div class="wishlist-wrap">
+      <p class="wishlist-hint">Aklına ne gelirse ekle, ikimiz de görürüz. Yaptığımızda üstünü çizeriz.</p>
+      <form id="wishlistForm">
+        <input type="text" id="wishlistInput" placeholder="Örn. Deniz kenarında gün batımını izlemek" autocomplete="off" required>
+        <button type="submit">Ekle</button>
+      </form>
+      <ul class="wishlist-list" id="wishlistList"></ul>
+      <div class="wishlist-empty" id="wishlistEmpty">Henüz bir şey eklenmedi, ilk dileği sen yaz.</div>
+    </div>
+  </section>
+
+  <section id="guestbook">
+    <div class="section-head"><div class="line"></div><h2>Not Bırak</h2><div class="line"></div></div>
+    <div class="guestbook-wrap">
+      <p class="guestbook-hint">Bana buradan bir şey yazabilirsin, doğrudan mailime düşer.</p>
+      <form id="guestbookForm">
+        <input type="hidden" name="access_key" id="gbAccessKey" value="">
+        <input type="hidden" name="subject" value="Siteden Yeni Not 💌">
+        <input type="hidden" name="from_name" id="gbFromName" value="">
+        <input type="checkbox" name="botcheck" class="hp-field" tabindex="-1" autocomplete="off">
+        <input type="text" name="isim" id="gbName" placeholder="Adın (opsiyonel)" autocomplete="off">
+        <textarea name="mesaj" id="gbMessage" placeholder="Aklından geçeni yaz..." rows="4" required></textarea>
+        <button type="submit" class="guestbook-btn">Gönder</button>
+      </form>
+      <div class="guestbook-success" id="guestbookSuccess"></div>
+    </div>
+  </section>
+
+  <section id="share">
+    <div class="section-head"><div class="line"></div><h2>Bu Sayfayı Sakla</h2><div class="line"></div></div>
+    <div class="share-card">
+      <div class="qr-box">
+        <img id="qrImg" alt="Site QR kodu" width="180" height="180">
+        <div class="qr-fallback" id="qrFallback" style="display:none;">QR kod şu an yüklenemedi, ama aşağıdaki linki kopyalayabilirsin.</div>
+      </div>
+      <div class="url-text" id="urlText"></div>
+      <button class="copy-btn" id="copyBtn">Linki Kopyala</button>
+    </div>
+  </section>
+
+</main>
+
+<audio id="bgAudio" loop preload="none">
+  <source src="audio/love-song.mp3" type="audio/mpeg">
+</audio>
+<button class="music-btn" id="musicBtn" aria-label="Müziği aç/kapat">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+</button>
+<div class="wish-toast" id="wishToast"></div>
+
+<div class="lightbox" id="lightbox">
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<footer>
+  <span class="footer-names"><span class="name-1"></span> <span class="star">&#10022;</span> <span class="name-2"></span> için</span>
+  <div class="who-change"><button id="whoChangeBtn" type="button">kimsin? değiştir</button></div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+/* ============================================================
+   İÇERİĞİ BURADAN KOLAYCA DÜZENLEYEBİLİRSİN
+   ============================================================ */
+
+// 0) İsimler — başlık, giriş ekranı, sertifika, ruh hali takvimi ve "Bugünün Sorusu"nda kullanılır
+//    NAME_1: siteyi hazırlayan kişi, NAME_2: siteyi hediye ettiğin kişi
+const NAME_1 = "Birinci İsim";
+const NAME_2 = "İkinci İsim";
+
+// 0b) Giriş ekranı — kullanıcı adı (büyük/küçük harf fark etmez) ve şifre
+//     Not: Bu sadece hafif bir kilit; sayfa kaynağına bakan herkes görebilir, gerçek bir sır koyma.
+const GATE_USER = "demo";
+const GATE_PASS = "1234";
+
+// 1) Buluşma tarihi (geri sayımın hedefi)
+const TARGET_DATE = new Date("2027-02-14T00:00:00");
+
+// 2) Günlük rastgele gösterilecek sözler (istediğin kadar ekleyip çıkarabilirsin)
+const QUOTES = [
+  "Aramızdaki mesafe ne kadar uzun olursa olsun, kalbim hep yanında.",
+  "Sabah ilk aklıma gelen, gece son düşündüğüm şey sensin.",
+  "Seninle geçen her an, en sevdiğim anım oluyor.",
+  "Aynı gökyüzüne bakıyoruz, bu yüzden aslında hiç uzak değiliz.",
+  "Gülüşün, en karanlık günümü bile aydınlatmaya yetiyor.",
+  "İyi ki varsın, iyi ki benimsin.",
+  "Seni her gün biraz daha çok seviyorum; dünden fazla, yarından az.",
+  "Sesini duymak, günümün en güzel anı.",
+  "Hayallerimin hepsinde bir köşede sen varsın.",
+  "Sana sarılacağım o anı dört gözle bekliyorum.",
+  "Kalbimin adresi hep aynı: sen.",
+  "Seninle her şey daha anlamlı, daha güzel.",
+  "Uzaklık sadece bir sayı; sevgimiz ondan çok daha büyük.",
+  "Her yıldız, sana söyleyemediğim bir 'seni seviyorum' gibi.",
+  "Yanındayken zaman duruyor, uzaktayken ise hiç geçmiyor.",
+  "Seni özlemek bile güzel, çünkü sen özlenmeye değersin.",
+  "Sen benim en güzel tesadüfüm, en doğru kararımsın.",
+  "Gözlerine bakınca kendimi evimde hissediyorum.",
+  "Dünyanın neresinde olursam olayım, kalbim seninle.",
+  "Seni sevmek, bugüne kadar yaptığım en güzel şey."
+];
+
+// 3) Her gün listeden bir "Günün Şarkısı" seçilir (Spotify'da aratma linki otomatik oluşur)
+//    PLAYLIST_ID: Altta gösterilecek Spotify playlist'inin kodu — playlist linkindeki
+//    open.spotify.com/playlist/BU_KISIM?si=... Boş bırakırsan playlist kutusu gizlenir.
+const PLAYLIST_ID = "";
+const SONGS = [
+  { name: "Gülümse", artist: "Sezen Aksu" },
+  { name: "Seni Kendime Sakladım", artist: "Duman" },
+  { name: "Bu Akşam", artist: "Duman" },
+  { name: "Ya Bu İşler Ne", artist: "Mabel Matiz" },
+  { name: "Öyle Kolaysa", artist: "Mabel Matiz" },
+  { name: "Bir Derdim Var", artist: "mor ve ötesi" },
+  { name: "Kış Güneşi", artist: "Tarkan" },
+  { name: "Ölürüm Sana", artist: "Tarkan" },
+  { name: "Hepsi Senin mi?", artist: "Tarkan" },
+  { name: "Hatasız Kul Olmaz", artist: "Orhan Gencebay" },
+  { name: "Aşkın Olayım", artist: "Simge" },
+  { name: "Seni Dert Etmeler", artist: "Madrigal" },
+  { name: "Gül Pembe", artist: "Barış Manço" },
+  { name: "Sen Olsan Bari", artist: "Aleyna Tilki" }
+];
+
+// 3b) Günün Sorusu — ikiniz de aynı soruyu cevaplar, ikiniz de cevaplayınca cevaplar karşılıklı açılır
+const DAILY_QUESTIONS = [
+  "En sevdiğin anımız hangisi?",
+  "Beni ilk gördüğünde aklından ne geçti?",
+  "Birlikte gitmek istediğin ama henüz gidemediğimiz bir yer var mı?",
+  "Beni en çok ne zaman özlüyorsun?",
+  "Hayalindeki bir günümüz nasıl geçer?",
+  "Bugün seni en çok ne güldürdü?",
+  "Benim hangi huyumu en çok seviyorsun?",
+  "10 yıl sonra birlikte nerede olmak istersin?",
+  "En sevdiğin ortak anımız nedir?",
+  "Bugün beni düşündüğün an hangisiydi?",
+  "Bir sonraki buluşmamızda ilk ne yapmak istersin?",
+  "Seni en çok neyim mutlu ediyor?",
+  "Birlikte öğrenmek istediğimiz bir şey var mı?",
+  "Şu an en çok neyi merak ediyorsun benimle ilgili?",
+  "Evimiz olsa ilk hangi odayı hayal edersin?",
+  "Bugün kendini nasıl hissettin, neden?",
+  "Benimle ilgili gülümsediğin küçük bir detay var mı?",
+  "Uzaktayken seni en çok rahatlatan şey ne?",
+  "Yeniden buluştuğumuzda ilk söylemek istediğin şey ne?",
+  "Beraber yapmadığımız ama çok istediğin bir şey var mı?"
+];
+
+// 4) Fotoğraf sayısı — images/ klasöründeki 1.jpg, 2.jpg ... dosyalarını kendi fotoğraflarınla değiştir
+const PHOTO_COUNT = 12;
+
+// 4b) Anı eşleştirme oyununda kaç fotoğraf çifti kullanılsın (images/1.jpg'den başlar)
+const MEMORY_PAIR_COUNT = 6;
+
+// 5) Hikayemiz zaman çizelgesi — kendi tarihlerinizle değiştirin
+const TIMELINE = [
+  { date: "14 Şubat 2024", title: "İlk Tanışma", text: "Bir tesadüfle başlayan, ikimizin de unutamadığı o ilk konuşma." },
+  { date: "2 Mart 2024", title: "İlk Buluşma", text: "Kahvelerimiz soğudu ama sohbetimiz hiç bitmedi." },
+  { date: "14 Nisan 2024", title: "Sevgili Olduk", text: "Hikayemizin resmen başladığı gün." },
+  { date: "1 Eylül 2025", title: "Uzak Mesafe Başladı", text: "Şehirlerimiz ayrıldı, kalplerimiz hiç ayrılmadı." },
+  { date: "14 Şubat 2027", title: "Yeniden Yan Yana", text: "Bu sefer hiç ayrılmamak üzere." }
+];
+
+// 5b) Kilometre taşı kutlamaları — birlikte olma başlangıç tarihiniz ve kutlanacak gün sayıları
+//     (bu sayılardan birine ulaşılan gün siteye girince otomatik bir kutlama açılır)
+const RELATIONSHIP_START_DATE = new Date("2024-04-14T00:00:00");
+const MILESTONE_DAYS = [100, 200, 365, 500, 1000];
+
+// 6) "Neden seni seviyorum" butonunda rastgele çıkacak sebepler
+const REASONS = [
+  "Çünkü gülüşün en kötü günümü bile güzelleştiriyor.",
+  "Çünkü sana anlattığım en sıradan şeyi bile ilgiyle dinliyorsun.",
+  "Çünkü yanımdayken kendim olmaktan hiç korkmuyorum.",
+  "Çünkü sesini duyunca güne yeniden başlayabiliyorum.",
+  "Çünkü sabrınla beni bile bazen ben kendime katlanamazken katlanıyorsun.",
+  "Çünkü hayallerimi benden çok sen önemsiyorsun.",
+  "Çünkü seninle sessizlik bile huzurlu.",
+  "Çünkü kötü bir günümde ilk aklıma gelen hep sen oluyorsun.",
+  "Çünkü sen büyüdükçe ben de daha iyi biri olmak istiyorum.",
+  "Çünkü sana sarılınca dünya biraz daha yavaşlıyor.",
+  "Çünkü beni en çirkin halimle bile seviyorsun.",
+  "Çünkü sen benim en sevdiğim tesadüfsün."
+];
+
+// 7) Kayan yıldıza tıklayınca çıkacak kısa dilekler
+const WISHES = [
+  "Bir dilek tut, bu sefer gerçek olsun.",
+  "Şu an nerede olursan ol, biliyorum ki gülümsüyorsun.",
+  "Buluşma günümüze bir adım daha yaklaştık.",
+  "Bu yıldız, seni özlediğim kadar parlıyor.",
+  "Gökyüzü paylaştığımız tek şey değil, unutma.",
+  "Bugün de seni düşünmeden geçen tek bir saat olmadı.",
+  "Bir gün daha bitti, sana bir gün daha yaklaştım."
+];
+
+// 8) Gökyüzündeki gizli yıldızlar (header alanına göre yüzdelik konum) ve hitap kelimeleri
+//    special:true olan yıldız biraz daha parlak durur ve tıklanınca ekstra bir kıvılcım efekti verir
+const SECRET_STARS = [
+  { top: "18%", left: "12%", word: "Bir Tanem" },
+  { top: "30%", left: "82%", word: "Sevgilim" },
+  { top: "62%", left: "8%",  word: "Aşkım" },
+  { top: "70%", left: "90%", word: "Güzelim", special: true },
+  { top: "45%", left: "50%", word: "Bebeğim" }
+];
+
+// 8b) Tüm gizli yıldızlar bulununca açılacak özel sürpriz mektup
+const SECRET_REWARD_TITLE = "Hepsini Buldun";
+const SECRET_REWARD_TEXT = "Sabırla aradın ve hepsini buldun, tıpkı beni bulduğun gibi. Bu senin için özel bir söz: nerede olursak olalım, hep seninle olacağım. Seni öyle çok seviyorum ki bunu bazen kelimelere sığdıramıyorum.";
+
+// 9) Anı eşleştirme oyunu tamamlanınca rastgele çıkacak kutlama mesajları
+const MEMORY_WIN_MESSAGES = [
+  "Hafızan da kalbin kadar güçlü.",
+  "Anılarımızı bir bir buldun, tıpkı hayatımda seni bulduğum gibi.",
+  "Her çift, birlikte geçirdiğimiz bir anı gibi tamamlandı.",
+  "Kazandın! Ödülün: benim sonsuz sevgim."
+];
+
+// 9b) "Sonsuza kadar benimle olur musun?" sorusuna Evet dediğinde çıkacak mesaj
+const FOREVER_REVEAL_TEXT = "Biliyordum. Sonsuza kadar seninleyim.";
+
+// 9c) Ruh hali takviminde seçilebilecek duygular ve renkleri
+const MOODS = [
+  { emoji: "🥰", label: "Aşık", color: "#e3b34f" },
+  { emoji: "😊", label: "Mutlu", color: "#f6dfa0" },
+  { emoji: "😌", label: "Huzurlu", color: "#8fd0c0" },
+  { emoji: "😢", label: "Özlemli", color: "#7a86c9" },
+  { emoji: "😴", label: "Yorgun", color: "#6b6b8a" },
+  { emoji: "😤", label: "Stresli", color: "#c96a6a" }
+];
+
+// 10) Bu sayfanın paylaşılacak/QR'a dönüşecek adresi
+//     Boş bırakırsan, sitenin o an açık olduğu adres kullanılır.
+const SITE_URL = "";
+
+// 11) Paylaşımlı bölümler (Yapmak İstediklerimiz, Ruh Hali, Bugünün Sorusu) için Firebase ayarı
+//     Boş bırakırsan bu bölümler yine çalışır ama veriler sadece o tarayıcıda saklanır
+//     (ikiniz aynı verileri göremezsiniz). Kurulum adımları README.md içinde.
+const FIREBASE_CONFIG = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+
+// 12) "Not Bırak" formu için web3forms.com'dan alacağın ücretsiz Access Key
+//     (notlar bu key'i aldığın e-posta adresine gelir). Boş bırakırsan form uyarı gösterir.
+const WEB3FORMS_ACCESS_KEY = "";
+
+/* ============================================================
+   AŞAĞISINI DEĞİŞTİRMENE GEREK YOK
+   ============================================================ */
+
+// İsimleri sayfadaki yerlerine yerleştir
+document.querySelectorAll(".name-1").forEach(function(el){ el.textContent = NAME_1; });
+document.querySelectorAll(".name-2").forEach(function(el){ el.textContent = NAME_2; });
+document.title = NAME_1 + " & " + NAME_2;
+document.querySelector('meta[name="apple-mobile-web-app-title"]').content = NAME_1 + " & " + NAME_2;
+document.getElementById("targetDateLabel").textContent =
+  TARGET_DATE.toLocaleDateString("tr-TR", { day:"numeric", month:"long", year:"numeric" }) + " · Tekrar Buluşma Günü";
+
+// Giriş kapısı (kullanıcı adı ve şifre yukarıda, içerik bölümünde)
+(function(){
+  const gate = document.getElementById("gate");
+  const card = gate.querySelector(".gate-card");
+  const form = document.getElementById("gateForm");
+  const userInput = document.getElementById("gateUser");
+  const passInput = document.getElementById("gatePass");
+  const errorEl = document.getElementById("gateError");
+
+  if(localStorage.getItem("ls_auth") === "1"){
+    gate.classList.add("hide");
+    document.documentElement.style.overflow = "";
+    checkMilestone();
+    startSharedFeatures();
+  } else {
+    document.documentElement.style.overflow = "hidden";
+  }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    const u = userInput.value.trim().toLocaleLowerCase("tr-TR");
+    const p = passInput.value.trim();
+    if(u === GATE_USER.toLocaleLowerCase("tr-TR") && p === GATE_PASS){
+      localStorage.setItem("ls_auth", "1");
+      gate.classList.add("hide");
+      document.documentElement.style.overflow = "";
+      celebrateEntry();
+      checkMilestone();
+      startSharedFeatures();
+    } else {
+      errorEl.textContent = "Kullanıcı adı veya şifre yanlış.";
+      card.classList.remove("shake");
+      void card.offsetWidth;
+      card.classList.add("shake");
+      passInput.value = "";
+    }
+  });
+})();
+
+// Açık / koyu tema düğmesi
+(function(){
+  const root = document.documentElement;
+  const themeBtn = document.getElementById("themeToggle");
+  themeBtn.addEventListener("click", function(){
+    const goingLight = root.getAttribute("data-theme") !== "light";
+    if(goingLight){ root.setAttribute("data-theme", "light"); }
+    else { root.removeAttribute("data-theme"); }
+    try{ localStorage.setItem("ls_theme", goingLight ? "light" : "dark"); }catch(e){}
+  });
+})();
+
+function getWho(){
+  try{ return localStorage.getItem("ls_who"); }catch(e){ return null; }
+}
+
+function showWhoOverlay(onChosen){
+  const overlay = document.getElementById("whoOverlay");
+  overlay.classList.add("show");
+  function pick(who){
+    try{ localStorage.setItem("ls_who", who); }catch(e){}
+    overlay.classList.remove("show");
+    onChosen(who);
+  }
+  document.getElementById("whoP1").onclick = function(){ pick("p1"); };
+  document.getElementById("whoP2").onclick = function(){ pick("p2"); };
+}
+
+// Firebase ayarlanmamışsa kullanılan yerel depo: Firestore'un bu sitede kullanılan küçük
+// bir kısmını taklit eder, veriyi sadece bu tarayıcının localStorage'ında tutar.
+function localDb(){
+  const listeners = [];
+  function load(col){ try{ return JSON.parse(localStorage.getItem("ls_db_" + col)) || {}; }catch(e){ return {}; } }
+  function save(col, data){
+    try{ localStorage.setItem("ls_db_" + col, JSON.stringify(data)); }catch(e){}
+    listeners.forEach(function(fn){ fn(); });
+    return Promise.resolve();
+  }
+  function listen(fn){ listeners.push(fn); fn(); }
+  return {
+    now: function(){ return Date.now(); },
+    collection: function(col){
+      const ref = {
+        orderBy: function(){ return ref; },
+        onSnapshot: function(cb){
+          listen(function(){
+            const data = load(col);
+            const ids = Object.keys(data);
+            cb({ empty: ids.length === 0, forEach: function(fn){ ids.forEach(function(id){ fn({ id: id, data: function(){ return data[id]; } }); }); } });
+          });
+        },
+        add: function(val){
+          const data = load(col);
+          data["d" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)] = val;
+          return save(col, data);
+        },
+        doc: function(id){
+          return {
+            set: function(val, opts){
+              const data = load(col);
+              data[id] = opts && opts.merge ? Object.assign({}, data[id], val) : val;
+              return save(col, data);
+            },
+            update: function(val){ return this.set(val, { merge: true }); },
+            delete: function(){ const data = load(col); delete data[id]; return save(col, data); },
+            onSnapshot: function(cb){
+              listen(function(){ const v = load(col)[id]; cb({ exists: !!v, data: function(){ return v; } }); });
+            }
+          };
+        }
+      };
+      return ref;
+    }
+  };
+}
+
+function startSharedFeatures(){
+  let db;
+  if(FIREBASE_CONFIG.projectId && window.firebase){
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    db.now = function(){ return firebase.firestore.FieldValue.serverTimestamp(); };
+  } else {
+    db = localDb();
+  }
+  initWishlist(db);
+  const who = getWho();
+  if(who){
+    initMood(who, db);
+    initDailyQuestion(who, db);
+  } else {
+    showWhoOverlay(function(chosenWho){
+      initMood(chosenWho, db);
+      initDailyQuestion(chosenWho, db);
+    });
+  }
+  const changeBtn = document.getElementById("whoChangeBtn");
+  if(changeBtn){
+    changeBtn.addEventListener("click", function(){
+      showWhoOverlay(function(){ location.reload(); });
+    });
+  }
+}
+
+// Seninle yapmak istediğim şeyler — paylaşımlı liste
+function initWishlist(db){
+  const wishlistRef = db.collection("wishlist");
+
+  const form = document.getElementById("wishlistForm");
+  const input = document.getElementById("wishlistInput");
+  const list = document.getElementById("wishlistList");
+  const empty = document.getElementById("wishlistEmpty");
+
+  wishlistRef.orderBy("createdAt", "asc").onSnapshot(function(snapshot){
+    list.innerHTML = "";
+    empty.style.display = snapshot.empty ? "block" : "none";
+    empty.textContent = "Henüz bir şey eklenmedi, ilk dileği sen yaz.";
+    snapshot.forEach(function(doc){
+      const data = doc.data();
+      const li = document.createElement("li");
+      li.className = "wishlist-item" + (data.done ? " done" : "");
+
+      const check = document.createElement("button");
+      check.type = "button";
+      check.className = "wishlist-check";
+      check.setAttribute("aria-label", "Tamamlandı olarak işaretle");
+      check.textContent = data.done ? "✓" : "";
+      check.addEventListener("click", function(){
+        wishlistRef.doc(doc.id).update({ done: !data.done });
+      });
+
+      const span = document.createElement("span");
+      span.className = "wishlist-text";
+      span.textContent = data.text;
+
+      const del = document.createElement("button");
+      del.type = "button";
+      del.className = "wishlist-del";
+      del.setAttribute("aria-label", "Sil");
+      del.innerHTML = "&times;";
+      del.addEventListener("click", function(){
+        wishlistRef.doc(doc.id).delete();
+      });
+
+      li.appendChild(check);
+      li.appendChild(span);
+      li.appendChild(del);
+      list.appendChild(li);
+    });
+  }, function(){
+    empty.style.display = "block";
+    empty.textContent = "Liste şu an yüklenemedi, internetini kontrol edip sayfayı yenile.";
+  });
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    const val = input.value.trim();
+    if(!val) return;
+    input.disabled = true;
+    wishlistRef.add({
+      text: val,
+      done: false,
+      createdAt: db.now()
+    }).finally(function(){
+      input.disabled = false;
+      input.value = "";
+      input.focus();
+    });
+  });
+}
+
+// Bugün Nasılsın? — paylaşımlı ruh hali takvimi
+function initMood(who, db){
+  const picker = document.getElementById("moodPicker");
+  const heatmap1 = document.getElementById("moodHeatmap1");
+  const heatmap2 = document.getElementById("moodHeatmap2");
+  const legend = document.getElementById("moodLegend");
+  const moodsRef = db.collection("moods");
+  const DAYS_SHOWN = 90;
+
+  function dateKey(d){
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  }
+  const todayKeyStr = dateKey(new Date());
+  let latest = {};
+
+  function renderPicker(){
+    const selected = latest[who + "_" + todayKeyStr];
+    Array.from(picker.children).forEach(function(btn, i){
+      btn.classList.toggle("selected", MOODS[i].label === selected);
+    });
+  }
+
+  function renderRow(container, person){
+    container.innerHTML = "";
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    for(let i = DAYS_SHOWN - 1; i >= 0; i--){
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const key = dateKey(d);
+      const moodLabel = latest[person + "_" + key];
+      const mood = MOODS.find(function(m){ return m.label === moodLabel; });
+      const cell = document.createElement("div");
+      cell.className = "mood-cell" + (i === 0 ? " today" : "");
+      cell.title = d.toLocaleDateString("tr-TR", { day:"numeric", month:"long" }) + (mood ? " · " + mood.label : "");
+      if(mood){ cell.style.background = mood.color; cell.style.borderColor = mood.color; }
+      container.appendChild(cell);
+    }
+  }
+
+  moodsRef.onSnapshot(function(snapshot){
+    latest = {};
+    snapshot.forEach(function(doc){ latest[doc.id] = doc.data().mood; });
+    renderPicker();
+    renderRow(heatmap1, "p1");
+    renderRow(heatmap2, "p2");
+  });
+
+  MOODS.forEach(function(mood){
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "mood-opt";
+    btn.textContent = mood.emoji;
+    btn.title = mood.label;
+    btn.addEventListener("click", function(){
+      moodsRef.doc(who + "_" + todayKeyStr).set({ who: who, date: todayKeyStr, mood: mood.label });
+    });
+    picker.appendChild(btn);
+
+    const item = document.createElement("span");
+    const dot = document.createElement("span");
+    dot.className = "dot";
+    dot.style.background = mood.color;
+    item.appendChild(dot);
+    item.appendChild(document.createTextNode(mood.label));
+    legend.appendChild(item);
+  });
+}
+
+// Bugünün Sorusu — ikiniz de cevaplayınca karşılıklı açılır
+function initDailyQuestion(who, db){
+  const questionEl = document.getElementById("dailyqQuestion");
+  const form = document.getElementById("dailyqForm");
+  const input = document.getElementById("dailyqInput");
+  const answersEl = document.getElementById("dailyqAnswers");
+  const names = { p1: NAME_1, p2: NAME_2 };
+  const otherWho = who === "p1" ? "p2" : "p1";
+
+  const todayKeyStr = todayKey();
+  const qIdx = hashString(todayKeyStr + "-question") % DAILY_QUESTIONS.length;
+  questionEl.textContent = DAILY_QUESTIONS[qIdx];
+
+  const docRef = db.collection("dailyAnswers").doc(todayKeyStr);
+
+  docRef.onSnapshot(function(snap){
+    const data = snap.exists ? snap.data() : {};
+    const mine = data[who];
+    const theirs = data[otherWho];
+
+    form.style.display = mine ? "none" : "flex";
+    answersEl.innerHTML = "";
+
+    if(mine && theirs){
+      [[who, mine], [otherWho, theirs]].forEach(function(pair){
+        const div = document.createElement("div");
+        div.className = "dailyq-answer";
+        const whoDiv = document.createElement("div");
+        whoDiv.className = "who";
+        whoDiv.textContent = names[pair[0]];
+        const textDiv = document.createElement("div");
+        textDiv.className = "text";
+        textDiv.textContent = pair[1];
+        div.appendChild(whoDiv);
+        div.appendChild(textDiv);
+        answersEl.appendChild(div);
+      });
+    } else if(mine && !theirs){
+      const div = document.createElement("div");
+      div.className = "dailyq-waiting";
+      div.textContent = names[otherWho] + " henüz cevaplamadı, cevaplayınca ikinizinkini de göreceksin.";
+      answersEl.appendChild(div);
+    }
+  });
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    const val = input.value.trim();
+    if(!val) return;
+    const update = {};
+    update[who] = val;
+    form.querySelector("button").disabled = true;
+    docRef.set(update, { merge: true }).finally(function(){
+      form.querySelector("button").disabled = false;
+      input.value = "";
+    });
+  });
+}
+
+function hashString(str){
+  let h = 0;
+  for(let i=0;i<str.length;i++){
+    h = (h * 31 + str.charCodeAt(i)) >>> 0;
+  }
+  return h;
+}
+function todayKey(){
+  const d = new Date();
+  return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+}
+
+// Günün sözü
+const quoteIdx = hashString(todayKey() + "-quote") % QUOTES.length;
+document.getElementById("dailyQuote").textContent = QUOTES[quoteIdx];
+document.getElementById("quoteDate").textContent = new Date().toLocaleDateString("tr-TR", { day:"numeric", month:"long", year:"numeric" });
+
+// Günün şarkısı
+const songIdx = hashString(todayKey() + "-song") % SONGS.length;
+const todaySong = SONGS[songIdx];
+document.getElementById("songName").textContent = todaySong.name + " — " + todaySong.artist;
+document.getElementById("songLink").href = "https://open.spotify.com/search/" + encodeURIComponent(todaySong.name + " " + todaySong.artist);
+if(PLAYLIST_ID){
+  document.getElementById("playlistFrame").src = "https://open.spotify.com/embed/playlist/" + PLAYLIST_ID + "?utm_source=generator&theme=0";
+} else {
+  document.getElementById("playlistEmbed").style.display = "none";
+}
+
+// Geri sayım
+function updateCountdown(){
+  const now = new Date();
+  const diff = TARGET_DATE - now;
+  const wrap = document.getElementById("countdownWrap");
+  if(diff <= 0){
+    wrap.classList.add("done");
+    document.getElementById("reunionMsg").textContent = "Bugün o gün! Sonunda tekrar birlikteyiz.";
+    return;
+  }
+  const days = Math.floor(diff / (1000*60*60*24));
+  const hours = Math.floor((diff / (1000*60*60)) % 24);
+  const mins = Math.floor((diff / (1000*60)) % 60);
+  const secs = Math.floor((diff / 1000) % 60);
+  document.getElementById("cd-days").textContent = String(days).padStart(2,"0");
+  document.getElementById("cd-hours").textContent = String(hours).padStart(2,"0");
+  document.getElementById("cd-mins").textContent = String(mins).padStart(2,"0");
+  document.getElementById("cd-secs").textContent = String(secs).padStart(2,"0");
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// Galeri
+const PLACEHOLDER_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 16l-5-5-4 4-3-3-6 6"/></svg>';
+const grid = document.getElementById("galleryGrid");
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightboxImg");
+for(let i=1;i<=PHOTO_COUNT;i++){
+  const cell = document.createElement("div");
+  cell.className = "photo";
+  const frame = document.createElement("div");
+  frame.className = "frame";
+  const img = document.createElement("img");
+  img.src = "images/" + i + ".jpg";
+  img.alt = "Anımız " + i;
+  img.loading = "lazy";
+  const placeholder = document.createElement("div");
+  placeholder.className = "placeholder";
+  placeholder.innerHTML = PLACEHOLDER_ICON + '<span>images/' + i + '.jpg</span>';
+  img.onerror = function(){ img.style.display = "none"; };
+  frame.appendChild(img);
+  frame.appendChild(placeholder);
+  const cap = document.createElement("div");
+  cap.className = "cap";
+  cap.textContent = "#" + i;
+  cell.appendChild(frame);
+  cell.appendChild(cap);
+  cell.addEventListener("click", function(){
+    if(img.style.display === "none") return;
+    lightboxImg.src = img.src;
+    lightbox.classList.add("open");
+  });
+  grid.appendChild(cell);
+}
+lightbox.addEventListener("click", function(){
+  lightbox.classList.remove("open");
+});
+
+// Saate göre gökyüzü rengi (şafak / gündüz / akşam / gece)
+const SKY_PHASES = [
+  { name: "gece",   start: 20, end: 5,  glow: "#2c2a54", glow2: "#141a35", starFactor: 1 },
+  { name: "safak",  start: 5,  end: 8,  glow: "#5b3a55", glow2: "#241d3c", starFactor: 0.45 },
+  { name: "gunduz", start: 8,  end: 17, glow: "#3c4a72", glow2: "#1b2440", starFactor: 0.12 },
+  { name: "aksam",  start: 17, end: 20, glow: "#6a3a4c", glow2: "#241a3a", starFactor: 0.55 }
+];
+function currentSkyPhase(){
+  const h = new Date().getHours() + new Date().getMinutes()/60;
+  return SKY_PHASES.find(function(p){
+    return p.start < p.end ? (h >= p.start && h < p.end) : (h >= p.start || h < p.end);
+  }) || SKY_PHASES[0];
+}
+let skyStarFactor = 1;
+function applySkyPhase(){
+  const phase = currentSkyPhase();
+  document.documentElement.style.setProperty("--sky-glow", phase.glow);
+  document.documentElement.style.setProperty("--sky-glow-2", phase.glow2);
+  skyStarFactor = phase.starFactor;
+}
+applySkyPhase();
+setInterval(applySkyPhase, 5*60*1000);
+
+// Telefonu eğince yıldızların kayması (gyroscope parallax)
+let tiltX = 0, tiltY = 0;
+(function(){
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(reduceMotion) return;
+  function handleOrientation(e){
+    if(e.gamma === null || e.beta === null) return;
+    tiltX = Math.max(-1, Math.min(1, e.gamma / 30));
+    tiltY = Math.max(-1, Math.min(1, (e.beta - 45) / 30));
+  }
+  function startListening(){
+    window.addEventListener("deviceorientation", handleOrientation);
+  }
+  function requestGyro(){
+    if(typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function"){
+      DeviceOrientationEvent.requestPermission().then(function(state){
+        if(state === "granted"){ startListening(); }
+      }).catch(function(){});
+    } else if(typeof DeviceOrientationEvent !== "undefined"){
+      startListening();
+    }
+  }
+  document.body.addEventListener("click", requestGyro, { once: true });
+  document.body.addEventListener("touchstart", requestGyro, { once: true });
+})();
+
+// Gece göğü - yıldızlar
+(function(){
+  const canvas = document.getElementById("sky");
+  const ctx = canvas.getContext("2d");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let stars = [];
+  let w, h;
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = document.body.scrollHeight;
+    const count = Math.floor((w * h) / 9000);
+    stars = [];
+    for(let i=0;i<count;i++){
+      stars.push({
+        x: Math.random()*w,
+        y: Math.random()*h,
+        r: Math.random()*1.3 + 0.3,
+        baseA: Math.random()*0.5 + 0.25,
+        phase: Math.random()*Math.PI*2,
+        speed: Math.random()*0.015 + 0.005
+      });
+    }
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  let t = 0;
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    t += 1;
+    for(const s of stars){
+      const a = (reduceMotion ? s.baseA : s.baseA + Math.sin(t*s.speed + s.phase) * 0.25) * skyStarFactor;
+      const ox = tiltX * s.r * 14;
+      const oy = tiltY * s.r * 14;
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(246,223,160," + Math.max(0,a) + ")";
+      ctx.arc(s.x + ox, s.y + oy, s.r, 0, Math.PI*2);
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Kıvılcım patlaması (sürpriz butonu ve özel gizli yıldız için ortak efekt)
+function starBurst(originEl){
+  const rect = originEl.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + rect.height/2;
+  for(let i=0;i<10;i++){
+    const s = document.createElement("span");
+    s.className = "spark";
+    s.textContent = "✦";
+    s.style.left = cx + "px";
+    s.style.top = cy + "px";
+    document.body.appendChild(s);
+    const angle = Math.random()*Math.PI*2;
+    const dist = 40 + Math.random()*60;
+    const dx = Math.cos(angle)*dist;
+    const dy = Math.sin(angle)*dist;
+    const anim = s.animate(
+      [
+        { transform: "translate(0,0) scale(1)", opacity: 1 },
+        { transform: "translate(" + dx + "px," + dy + "px) scale(0.4)", opacity: 0 }
+      ],
+      { duration: 650 + Math.random()*250, easing: "ease-out" }
+    );
+    anim.onfinish = function(){ s.remove(); };
+  }
+}
+
+// Giriş kutlaması: kapı açılınca kısa bir kalp/yıldız yağmuru
+function celebrateEntry(){
+  const layer = document.createElement("div");
+  layer.className = "confetti-layer";
+  document.body.appendChild(layer);
+  const symbols = ["♥","✦","❋","✧"];
+  const colors = ["var(--gold)","var(--gold-soft)","var(--paper)"];
+  const count = 46;
+  for(let i=0;i<count;i++){
+    const el = document.createElement("span");
+    el.className = "confetti-piece";
+    el.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+    el.style.left = Math.random()*100 + "vw";
+    el.style.color = colors[Math.floor(Math.random()*colors.length)];
+    el.style.fontSize = (12 + Math.random()*16) + "px";
+    const duration = 2600 + Math.random()*1800;
+    const delay = Math.random()*450;
+    const drift = Math.random()*160 - 80;
+    const rotate = Math.random()*720 - 360;
+    el.style.setProperty("--drift", drift + "px");
+    el.style.setProperty("--rotate", rotate + "deg");
+    el.style.animationDuration = duration + "ms";
+    el.style.animationDelay = delay + "ms";
+    layer.appendChild(el);
+  }
+  setTimeout(function(){ layer.remove(); }, 5200);
+}
+
+// Kilometre taşı kutlaması: birlikte geçen gün sayısı özel bir sayıya ulaştıysa (günde bir kez) kutlama açar
+function checkMilestone(){
+  const daysTogether = Math.floor((new Date() - RELATIONSHIP_START_DATE) / 86400000);
+  if(MILESTONE_DAYS.indexOf(daysTogether) === -1) return;
+  const key = "ls_milestone_" + daysTogether;
+  if(localStorage.getItem(key)) return;
+  localStorage.setItem(key, "1");
+  setTimeout(function(){ showMilestoneCelebration(daysTogether); }, 1000);
+}
+function showMilestoneCelebration(days){
+  const overlay = document.createElement("div");
+  overlay.className = "milestone-overlay";
+  overlay.innerHTML =
+    '<div class="milestone-card">' +
+      '<div class="milestone-kicker">Kilometre Taşı</div>' +
+      '<div class="milestone-num">' + days + '</div>' +
+      '<div class="milestone-label">gündür birlikteyiz</div>' +
+      '<button class="milestone-close">Kapat</button>' +
+    '</div>';
+  document.body.appendChild(overlay);
+  celebrateEntry();
+  overlay.querySelector(".milestone-close").addEventListener("click", function(){
+    overlay.remove();
+  });
+}
+
+// Hikayemiz zaman çizelgesi
+(function(){
+  const list = document.getElementById("timelineList");
+  TIMELINE.forEach(function(item){
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML =
+      '<div class="date">' + item.date + '</div>' +
+      '<div class="title">' + item.title + '</div>' +
+      '<div class="text">' + item.text + '</div>';
+    list.appendChild(el);
+  });
+})();
+
+// Gizli yıldızlar
+(function(){
+  const layer = document.getElementById("secretLayer");
+  const panel = document.getElementById("secretPanel");
+  const reward = document.getElementById("secretReward");
+  const foundEl = document.getElementById("secretFound");
+  document.getElementById("secretTotal").textContent = SECRET_STARS.length;
+  let found = 0;
+  SECRET_STARS.forEach(function(star, idx){
+    const btn = document.createElement("button");
+    btn.className = "secret-star" + (star.special ? " special" : "");
+    btn.style.top = star.top;
+    btn.style.left = star.left;
+    btn.setAttribute("aria-label", "Gizli yıldız");
+    btn.addEventListener("click", function(){
+      panel.textContent = star.word;
+      panel.classList.add("show");
+      panel.classList.toggle("celebrate", !!star.special);
+      if(star.special){ starBurst(btn); }
+      if(!btn.classList.contains("found")){
+        btn.classList.add("found");
+        found++;
+        foundEl.textContent = found;
+        if(found === SECRET_STARS.length){
+          reward.innerHTML =
+            '<div class="kicker">Özel Sürpriz</div>' +
+            '<div class="title">' + SECRET_REWARD_TITLE + '</div>' +
+            '<div class="text">' + SECRET_REWARD_TEXT + '</div>';
+          reward.classList.add("show");
+          celebrateEntry();
+        }
+      }
+    });
+    layer.appendChild(btn);
+  });
+})();
+
+// Kayan yıldız
+(function(){
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const toast = document.getElementById("wishToast");
+  let toastTimer = null;
+  let lastWish = -1;
+
+  function showWish(){
+    let idx = Math.floor(Math.random()*WISHES.length);
+    if(WISHES.length > 1 && idx === lastWish){ idx = (idx+1) % WISHES.length; }
+    lastWish = idx;
+    toast.textContent = WISHES[idx];
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove("show"); }, 4200);
+  }
+
+  function spawnShootingStar(){
+    if(document.hidden) return;
+    const el = document.createElement("div");
+    el.className = "shooting-star";
+    el.innerHTML = '<span class="dot"></span>';
+    const startX = 10 + Math.random()*55;
+    const startY = 6 + Math.random()*26;
+    el.style.left = startX + "vw";
+    el.style.top = startY + "vh";
+    document.body.appendChild(el);
+    const dx = 220 + Math.random()*160;
+    const dy = 130 + Math.random()*90;
+    let clicked = false;
+    const anim = el.animate(
+      [
+        { transform: "translate(0,0)", opacity: 0 },
+        { opacity: 1, offset: 0.1 },
+        { transform: "translate(" + dx + "px," + dy + "px)", opacity: 0 }
+      ],
+      { duration: reduceMotion ? 1 : 2400 + Math.random()*700, easing: "ease-in" }
+    );
+    el.addEventListener("click", function(e){
+      if(clicked) return;
+      clicked = true;
+      e.stopPropagation();
+      showWish();
+      anim.cancel();
+      el.remove();
+    });
+    anim.onfinish = function(){ if(!clicked) el.remove(); };
+  }
+
+  function scheduleNext(){
+    const delay = 16000 + Math.random()*14000;
+    setTimeout(function(){ spawnShootingStar(); scheduleNext(); }, delay);
+  }
+  setTimeout(spawnShootingStar, 5000);
+  scheduleNext();
+})();
+
+// Sürpriz: neden seni seviyorum
+(function(){
+  const btn = document.getElementById("reasonBtn");
+  const reveal = document.getElementById("reasonReveal");
+  let last = -1;
+
+  btn.addEventListener("click", function(){
+    let idx = Math.floor(Math.random()*REASONS.length);
+    if(REASONS.length > 1 && idx === last){ idx = (idx+1) % REASONS.length; }
+    last = idx;
+    reveal.textContent = REASONS[idx];
+    reveal.classList.remove("show");
+    void reveal.offsetWidth;
+    reveal.classList.add("show");
+    starBurst(btn);
+  });
+})();
+
+// Sonsuza kadar benimle olur musun? — Hayır butonu kaçar
+(function(){
+  const wrap = document.getElementById("foreverBtns");
+  const yesBtn = document.getElementById("foreverYes");
+  const noBtn = document.getElementById("foreverNo");
+  const reveal = document.getElementById("foreverReveal");
+  const certOpenBtn = document.getElementById("certOpenBtn");
+  let dodges = 0;
+  let answered = false;
+
+  function dodge(){
+    if(answered) return;
+    dodges++;
+    const rect = wrap.getBoundingClientRect();
+    const btnRect = noBtn.getBoundingClientRect();
+    const maxLeft = Math.max(0, rect.width - btnRect.width);
+    const maxTop = Math.max(0, rect.height - btnRect.height);
+    const newLeft = Math.random() * maxLeft;
+    const newTop = Math.random() * maxTop;
+    noBtn.classList.add("dodging");
+    noBtn.style.left = newLeft + "px";
+    noBtn.style.top = newTop + "px";
+    const scale = Math.max(0.55, 1 - dodges * 0.05);
+    noBtn.style.fontSize = (14 * scale) + "px";
+    noBtn.style.padding = (14 * scale) + "px " + (30 * scale) + "px";
+    const yesScale = Math.min(1.6, 1 + dodges * 0.05);
+    yesBtn.style.transform = "scale(" + yesScale + ")";
+  }
+
+  noBtn.addEventListener("mouseenter", dodge);
+  noBtn.addEventListener("touchstart", function(e){ e.preventDefault(); dodge(); }, { passive: false });
+  noBtn.addEventListener("click", function(e){ e.preventDefault(); dodge(); });
+
+  yesBtn.addEventListener("click", function(){
+    if(answered) return;
+    answered = true;
+    reveal.textContent = FOREVER_REVEAL_TEXT;
+    reveal.classList.add("show");
+    certOpenBtn.classList.add("show");
+    celebrateEntry();
+    starBurst(yesBtn);
+  });
+})();
+
+// Sertifika: sonsuza kadar sorusuna evet dendiğinde açılabilen yazdırılabilir sertifika
+(function(){
+  const overlay = document.getElementById("certOverlay");
+  const closeBtn = document.getElementById("certCloseBtn");
+  const printBtn = document.getElementById("certPrintBtn");
+  const openBtn = document.getElementById("certOpenBtn");
+  const dateEl = document.getElementById("certDate");
+  if(!overlay) return;
+
+  openBtn.addEventListener("click", function(){
+    dateEl.textContent = new Date().toLocaleDateString("tr-TR", { day:"numeric", month:"long", year:"numeric" });
+    overlay.classList.add("show");
+  });
+  closeBtn.addEventListener("click", function(){
+    overlay.classList.remove("show");
+  });
+  printBtn.addEventListener("click", function(){
+    window.print();
+  });
+})();
+
+// Not defteri (Web3Forms — ücretsiz, Netlify'a bağımlı değil)
+(function(){
+  const form = document.getElementById("guestbookForm");
+  const success = document.getElementById("guestbookSuccess");
+  if(!form) return;
+  document.getElementById("gbAccessKey").value = WEB3FORMS_ACCESS_KEY;
+  document.getElementById("gbFromName").value = NAME_1 + " & " + NAME_2 + " Sitesi";
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    if(!WEB3FORMS_ACCESS_KEY){
+      success.textContent = "Not defteri henüz ayarlanmadı (WEB3FORMS_ACCESS_KEY boş).";
+      success.classList.add("show");
+      return;
+    }
+    const data = new FormData(form);
+    fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: { "Accept": "application/json" },
+      body: data
+    }).then(function(res){ return res.json(); }).then(function(json){
+      if(json.success){
+        form.reset();
+        form.style.display = "none";
+        success.textContent = "Gönderildi! Teşekkürler ♥";
+      } else {
+        success.textContent = "Gönderilemedi, lütfen tekrar dener misin?";
+      }
+      success.classList.add("show");
+    }).catch(function(){
+      success.textContent = "Gönderilemedi, internet bağlantını kontrol edip tekrar dener misin?";
+      success.classList.add("show");
+    });
+  });
+})();
+
+// Anı eşleştirme oyunu
+(function(){
+  const grid = document.getElementById("memoryGrid");
+  const status = document.getElementById("memoryStatus");
+  const winEl = document.getElementById("memoryWin");
+  const restartBtn = document.getElementById("memoryRestart");
+  const PLACEHOLDER = '<svg class="ph-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.5"/><path d="M21 16l-5-5-4 4-3-3-6 6"/></svg>';
+  const pairCount = Math.max(3, Math.min(MEMORY_PAIR_COUNT, PHOTO_COUNT));
+  const PREVIEW_SECONDS = 5;
+  let moves = 0, matched = 0, flipped = [], busy = false, lastWin = -1, previewTimer = null;
+
+  function shuffledDeck(){
+    const ids = [];
+    for(let i=1;i<=pairCount;i++){ ids.push(i, i); }
+    for(let i=ids.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      const tmp = ids[i]; ids[i] = ids[j]; ids[j] = tmp;
+    }
+    return ids;
+  }
+
+  function updateStatus(){
+    status.textContent = "Hamle: " + moves + " · Eşleşen: " + matched + "/" + pairCount;
+  }
+
+  function render(){
+    moves = 0; matched = 0; flipped = []; busy = true;
+    if(previewTimer){ clearInterval(previewTimer); previewTimer = null; }
+    winEl.classList.remove("show");
+    winEl.textContent = "";
+    grid.innerHTML = "";
+    shuffledDeck().forEach(function(photoId){
+      const tile = document.createElement("div");
+      tile.className = "memory-tile flipped";
+      tile.dataset.id = photoId;
+      const inner = document.createElement("div");
+      inner.className = "memory-tile-inner";
+      const back = document.createElement("div");
+      back.className = "memory-face back";
+      back.textContent = "✦";
+      const front = document.createElement("div");
+      front.className = "memory-face front";
+      const img = document.createElement("img");
+      img.src = "images/" + photoId + ".jpg";
+      img.alt = "Anı " + photoId;
+      img.loading = "lazy";
+      img.onerror = function(){ img.style.display = "none"; front.innerHTML += PLACEHOLDER; };
+      front.appendChild(img);
+      inner.appendChild(back);
+      inner.appendChild(front);
+      tile.appendChild(inner);
+      tile.addEventListener("click", function(){ handleClick(tile); });
+      grid.appendChild(tile);
+    });
+
+    let remaining = PREVIEW_SECONDS;
+    status.textContent = "Kartları ezberle... " + remaining;
+    previewTimer = setInterval(function(){
+      remaining--;
+      if(remaining > 0){
+        status.textContent = "Kartları ezberle... " + remaining;
+      } else {
+        clearInterval(previewTimer);
+        previewTimer = null;
+        Array.from(grid.children).forEach(function(t){ t.classList.remove("flipped"); });
+        busy = false;
+        updateStatus();
+      }
+    }, 1000);
+  }
+
+  function handleClick(tile){
+    if(busy || tile.classList.contains("flipped") || tile.classList.contains("matched")) return;
+    tile.classList.add("flipped");
+    flipped.push(tile);
+    if(flipped.length === 2){
+      moves++;
+      busy = true;
+      const a = flipped[0], b = flipped[1];
+      if(a.dataset.id === b.dataset.id){
+        a.classList.add("matched");
+        b.classList.add("matched");
+        matched++;
+        flipped = [];
+        busy = false;
+        updateStatus();
+        if(matched === pairCount){ finish(); }
+      } else {
+        updateStatus();
+        setTimeout(function(){
+          a.classList.remove("flipped");
+          b.classList.remove("flipped");
+          flipped = [];
+          busy = false;
+        }, 850);
+      }
+    }
+  }
+
+  function finish(){
+    let idx = Math.floor(Math.random()*MEMORY_WIN_MESSAGES.length);
+    if(MEMORY_WIN_MESSAGES.length > 1 && idx === lastWin){ idx = (idx+1) % MEMORY_WIN_MESSAGES.length; }
+    lastWin = idx;
+    winEl.textContent = MEMORY_WIN_MESSAGES[idx] + " (" + moves + " hamlede tamamladın)";
+    winEl.classList.add("show");
+    starBurst(restartBtn);
+  }
+
+  restartBtn.addEventListener("click", render);
+  render();
+})();
+
+// Paylaş / QR kod
+(function(){
+  const shareUrl = SITE_URL || window.location.href;
+  document.getElementById("urlText").textContent = shareUrl;
+  const qrImg = document.getElementById("qrImg");
+  const qrFallback = document.getElementById("qrFallback");
+  qrImg.onerror = function(){
+    qrImg.style.display = "none";
+    qrFallback.style.display = "block";
+  };
+  qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=" + encodeURIComponent(shareUrl);
+
+  const copyBtn = document.getElementById("copyBtn");
+  copyBtn.addEventListener("click", function(){
+    navigator.clipboard.writeText(shareUrl).then(function(){
+      const original = copyBtn.textContent;
+      copyBtn.textContent = "Kopyalandı";
+      setTimeout(function(){ copyBtn.textContent = original; }, 1800);
+    });
+  });
+})();
+
+// Arka plan müziği
+(function(){
+  const audio = document.getElementById("bgAudio");
+  const btn = document.getElementById("musicBtn");
+  let ready = true;
+  audio.addEventListener("error", function(){ ready = false; btn.style.display = "none"; });
+  btn.addEventListener("click", function(){
+    if(!ready) return;
+    if(audio.paused){
+      audio.play().then(function(){ btn.classList.add("playing"); }).catch(function(){});
+    } else {
+      audio.pause();
+      btn.classList.remove("playing");
+    }
+  });
+})();
+</script>
+</body>
+</html>
